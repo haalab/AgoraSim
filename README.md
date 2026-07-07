@@ -41,8 +41,6 @@ docs/
   downloads/
     agorasim-local-demo-package.zip  Full local runnable package
     PACKAGE_MANIFEST.txt             Package contents and safety notes
-.nojekyll                            Keeps GitHub Pages from processing files
-README.md                            This repository landing README
 ```
 
 ## Core Features
