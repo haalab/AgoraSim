@@ -53,27 +53,6 @@ docs/
 | Classical references | Threshold/Bass, Deffuant, SIR, herding, DeGroot/voter and discrete-choice reference dynamics |
 | Audit records | Resolved configurations, prompts, decisions, heard statements, model metadata, costs and rule diagnostics |
 
-## Publish With GitHub Pages
-
-1. Create or open a GitHub repository.
-2. Upload everything in this folder to the repository root.
-3. Go to **Settings -> Pages**.
-4. Select **Deploy from a branch**.
-5. Choose your branch, usually `main`.
-6. Choose the `/docs` folder.
-7. Save and wait for GitHub Pages to finish deploying.
-
-## Update The Download Package Later
-
-In the development repository, rebuild the static assets and local package:
-
-```bash
-bash scripts/build_github_pages_package.sh
-```
-
-Then copy the updated `docs/` folder into this upload package again, or commit
-the updated `docs/` folder directly to GitHub.
-
 ## Responsible-Use Note
 
 AgoraSim is designed for exploratory scenario analysis, teaching, method
