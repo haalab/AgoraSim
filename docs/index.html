@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgoraSim: A Hybrid Agent-Based Modeling Framework</title>
+  <meta name="description" content="AgoraSim is a hybrid agent-based modeling framework for scenario-oriented social reaction analysis.">
+  <style>
+    :root {
+      --bg:#f7f3ec;
+      --paper:#fffdf8;
+      --panel:#f1eadf;
+      --ink:#2d261f;
+      --muted:#776b5e;
+      --line:#ddd0bd;
+      --accent:#b75f2c;
+      --accent2:#315f72;
+      --green:#3c7a52;
+      --red:#a54b43;
+      --shadow:0 18px 50px rgba(50,39,27,.12);
+      --radius:8px;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      color:var(--ink);
+      background:var(--bg);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height:1.55;
+    }
+    a { color:inherit; }
+    .wrap { width:min(1160px, calc(100% - 36px)); margin:0 auto; }
+    header {
+      position:sticky;
+      top:0;
+      z-index:20;
+      border-bottom:1px solid rgba(221,208,189,.82);
+      background:rgba(247,243,236,.92);
+      backdrop-filter:blur(14px);
+    }
+    .nav {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      min-height:68px;
+    }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:900; }
+    .mark {
+      width:34px;
+      height:34px;
+      border-radius:8px;
+      background:linear-gradient(135deg, var(--accent), #e2b04d);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);
+    }
+    .links { display:flex; gap:18px; align-items:center; color:var(--muted); font-size:14px; }
+    .links a { text-decoration:none; }
+    .links a:hover { color:var(--ink); }
+    .button {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:42px;
+      border:1px solid var(--ink);
+      border-radius:8px;
+      padding:10px 15px;
+      background:var(--ink);
+      color:white;
+      text-decoration:none;
+      font-weight:800;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .button.secondary {
+      color:var(--ink);
+      background:transparent;
+      border-color:var(--line);
+    }
+    .button.ghost {
+      color:var(--accent2);
+      background:white;
+      border-color:var(--line);
+    }
+    .hero {
+      display:grid;
+      grid-template-columns:minmax(0, .95fr) minmax(380px, 1.05fr);
+      gap:34px;
+      align-items:center;
+      padding:58px 0 38px;
+    }
+    .eyebrow {
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      color:var(--accent2);
+      font-weight:900;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:14px;
+    }
+    h1, h2, h3 { line-height:1.08; margin:0; }
+    h1 { font-size:clamp(42px, 6vw, 76px); letter-spacing:0; }
+    h2 { font-size:clamp(28px, 4vw, 44px); }
+    h3 { font-size:20px; }
+    p { color:var(--muted); margin:14px 0 0; }
+    .lead { font-size:18px; color:#564a3e; max-width:64ch; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+    .stats {
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:10px;
+      margin-top:24px;
+    }
+    .stat {
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(255,253,248,.72);
+      padding:12px;
+    }
+    .stat b { display:block; font-size:18px; }
+    .stat span { color:var(--muted); font-size:12px; }
+    .screen {
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--paper);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .screen img { display:block; width:100%; height:auto; }
+    .screenbar {
+      display:flex;
+      gap:6px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background:var(--panel);
+    }
+    .dot { width:10px; height:10px; border-radius:50%; background:#c46b5a; }
+    .dot:nth-child(2) { background:#d9a343; }
+    .dot:nth-child(3) { background:#5b9268; }
+    section { padding:54px 0; }
+    .section-head {
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-end;
+      margin-bottom:20px;
+    }
+    .section-head p { max-width:64ch; }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:14px;
+    }
+    .card {
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:var(--paper);
+      padding:18px;
+      min-width:0;
+    }
+    .card small, .muted { color:var(--muted); }
+    .tag {
+      display:inline-flex;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:4px 9px;
+      color:var(--muted);
+      font-size:12px;
+      margin:0 4px 6px 0;
+      background:rgba(255,255,255,.65);
+    }
+    .demo {
+      display:grid;
+      grid-template-columns:360px minmax(0, 1fr);
+      gap:14px;
+      align-items:start;
+    }
+    label {
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      color:#5d5145;
+      margin:14px 0 6px;
+    }
+    select, input {
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:11px 12px;
+      background:white;
+      color:var(--ink);
+      font:inherit;
+    }
+    .metric-grid {
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .metric {
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:12px;
+      background:rgba(241,234,223,.45);
+    }
+    .metric span { display:block; color:var(--muted); font-size:12px; }
+    .metric b { font-size:24px; }
+    .bars { display:grid; gap:9px; margin-top:10px; }
+    .bar-row {
+      display:grid;
+      grid-template-columns:minmax(120px, 170px) 1fr 48px;
+      gap:10px;
+      align-items:center;
+      font-size:13px;
+    }
+    .bar-track {
+      height:11px;
+      border-radius:999px;
+      background:#e7dccd;
+      overflow:hidden;
+    }
+    .bar-fill {
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--accent2), #6fa3a3);
+      width:50%;
+    }
+    .timeline {
+      display:grid;
+      gap:8px;
+      margin-top:14px;
+    }
+    .event {
+      border-left:3px solid var(--accent);
+      padding:8px 10px;
+      background:rgba(183,95,44,.08);
+      border-radius:0 8px 8px 0;
+      color:#584b3e;
+      font-size:13px;
+    }
+    .split {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .shot-grid {
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:14px;
+    }
+    .shot {
+      overflow:hidden;
+      padding:0;
+    }
+    .shot img { width:100%; display:block; }
+    .shot div { padding:12px; }
+    .steps {
+      counter-reset:step;
+      display:grid;
+      gap:10px;
+    }
+    .step {
+      position:relative;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--paper);
+      padding:14px 14px 14px 50px;
+    }
+    .step:before {
+      counter-increment:step;
+      content:counter(step);
+      position:absolute;
+      left:14px;
+      top:14px;
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:var(--ink);
+      color:white;
+      font-weight:900;
+      font-size:12px;
+    }
+    code {
+      background:#ece2d3;
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:2px 6px;
+      color:#3b3027;
+    }
+    footer {
+      border-top:1px solid var(--line);
+      padding:28px 0 40px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    @media (max-width:900px) {
+      .hero, .demo, .split { grid-template-columns:1fr; }
+      .hero { padding-top:34px; }
+      .grid, .shot-grid, .metric-grid { grid-template-columns:1fr; }
+      .links { display:none; }
+      .section-head { display:block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand"><span class="mark"></span><span>AgoraSim</span></div>
+      <nav class="links" aria-label="Page navigation">
+        <a href="#preview">Preview</a>
+        <a href="#method">Method</a>
+        <a href="#download">Download</a>
+        <a href="#deploy">Deploy</a>
+      </nav>
+      <a class="button" href="downloads/agorasim-local-demo-package.zip">Download package</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div>
+        <div class="eyebrow">Hybrid agent-based modeling framework</div>
+        <h1>Inspect scenario trajectories under explicit modeling assumptions.</h1>
+        <p class="lead">
+          AgoraSim resolves natural-language or multimodal artifacts into
+          editable ABM configurations, runs ratio-controlled populations of LLM,
+          VLM, custom-endpoint, random and classical agents, and compares the
+          same scenario against matched classical reference dynamics.
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="downloads/agorasim-local-demo-package.zip">Download local package</a>
+          <a class="button secondary" href="#preview">Try browser preview</a>
+        </div>
+        <div class="stats" aria-label="Core features">
+          <div class="stat"><b>1</b><span>shared decision schema</span></div>
+          <div class="stat"><b>6</b><span>interaction protocols</span></div>
+          <div class="stat"><b>7</b><span>reference dynamics</span></div>
+        </div>
+      </div>
+      <div class="screen" aria-label="AgoraSim application screenshot">
+        <div class="screenbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <img src="assets/ui_results_dashboard.png" alt="AgoraSim results dashboard">
+      </div>
+    </section>
+
+    <section class="wrap" id="preview">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Browser-only preview</div>
+          <h2>Inspect an illustrative browser-only trajectory.</h2>
+        </div>
+        <p>
+          This panel is intentionally static and local to your browser. It is a
+          lightweight illustration of the workflow, not an accuracy evaluation
+          or public-opinion prediction. Download the package when you want the
+          real local UI, SDK/CLI, REST API, LLM/VLM calls and audit records.
+        </p>
+      </div>
+      <div class="demo">
+        <div class="card">
+          <h3>Preview settings</h3>
+          <label for="scenario">Scenario</label>
+          <select id="scenario">
+            <option value="transit">Transit policy announcement</option>
+            <option value="ad">New drink flyer test</option>
+            <option value="market">Market shock narrative</option>
+          </select>
+          <label for="population">Target population</label>
+          <select id="population">
+            <option value="tokyo">Office workers in Tokyo</option>
+            <option value="students">Urban university students</option>
+            <option value="investors">Retail investors</option>
+          </select>
+          <label for="protocol">Interaction protocol</label>
+          <select id="protocol">
+            <option value="independent">Independent survey</option>
+            <option value="diffusion">Social diffusion</option>
+            <option value="focus">Focus group</option>
+          </select>
+          <button class="button" style="width:100%;margin-top:16px" id="runPreview">Run preview</button>
+          <p><small>For live model calls, upload media and download JSON records, use the local package.</small></p>
+        </div>
+        <div class="card">
+          <div class="metric-grid">
+            <div class="metric"><span>Adoption</span><b id="mAdoption">41%</b></div>
+            <div class="metric"><span>Mean stance</span><b id="mStance">0.18</b></div>
+            <div class="metric"><span>Polarization</span><b id="mPolar">0.31</b></div>
+            <div class="metric"><span>Reference gap</span><b id="mGap">+7%</b></div>
+          </div>
+          <h3>Action distribution</h3>
+          <div class="bars" id="bars"></div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="method">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Research system</div>
+          <h2>A scenario workbench, hybrid engine and audit layer.</h2>
+        </div>
+        <p>
+          AgoraSim turns open-ended artifacts into explicit configurations whose
+          assumptions can be inspected, edited, executed and compared across
+          shared action spaces, metrics, records and reference dynamics.
+        </p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Artifact to configuration</h3>
+          <p>Briefs, drafts and media are resolved into editable event, population, action-space, survey, network, model-mix and comparison settings.</p>
+          <div style="margin-top:14px">
+            <span class="tag">Scenario workbench</span><span class="tag">Editable assumptions</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Hybrid execution substrate</h3>
+          <p>LLM, VLM, custom-endpoint, random and classical agents share one structured decision interface and ratio-controlled model slots.</p>
+          <div style="margin-top:14px">
+            <span class="tag">LLM/VLM</span><span class="tag">Classic</span><span class="tag">Custom</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Reference dynamics and audit</h3>
+          <p>Matched all-classical runs help interpret whether a trajectory resembles threshold, contagion, herding, learning or utility dynamics.</p>
+          <div style="margin-top:14px">
+            <span class="tag">Matched comparison</span><span class="tag">Records</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="shot-grid">
+        <div class="card shot">
+          <img src="assets/ui_scenario_setup.png" alt="Scenario setup UI">
+          <div><b>Scenario setup</b><br><small>Resolve artifacts into editable configuration fields.</small></div>
+        </div>
+        <div class="card shot">
+          <img src="assets/ui_interaction_design.png" alt="Interaction design UI">
+          <div><b>Interaction design</b><br><small>Make exposure assumptions visible and editable.</small></div>
+        </div>
+        <div class="card shot">
+          <img src="assets/ui_abm_strategies.png" alt="Classic ABM strategies UI">
+          <div><b>Reference dynamics</b><br><small>Compare against matched classical ABM trajectories.</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="download">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Download</div>
+          <h2>Run the full system locally.</h2>
+        </div>
+        <p>
+          The package includes the local browser UI, FastAPI server, Python
+          SDK/CLI, REST endpoints, example configurations, packaging scripts and
+          documentation. Users bring their own model API keys for live LLM/VLM
+          calls.
+        </p>
+      </div>
+      <div class="split">
+        <div class="card">
+          <h3>Local package</h3>
+          <p>Recommended for reviewers, collaborators and students who want to inspect the full scenario workflow on their own machine.</p>
+          <div class="hero-actions">
+            <a class="button" href="downloads/agorasim-local-demo-package.zip">Download ZIP</a>
+            <a class="button secondary" href="downloads/PACKAGE_MANIFEST.txt">View manifest</a>
+          </div>
+          <p><small>Requires Python 3.10+. The first launch installs dependencies into a local `.venv` folder.</small></p>
+        </div>
+        <div class="steps">
+          <div class="step"><b>Download and unzip</b><br><span class="muted">Keep the folder in a normal user-writable location such as Desktop or Documents.</span></div>
+          <div class="step"><b>Launch locally</b><br><span class="muted">macOS: `run_macos.command`. Windows: `run_windows.bat` or `run_windows.ps1`.</span></div>
+          <div class="step"><b>Open the browser UI</b><br><span class="muted">AgoraSim starts on `127.0.0.1:8000` or the next available local port.</span></div>
+          <div class="step"><b>Paste optional API keys</b><br><span class="muted">Keys remain in memory and are not included in exported records.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="deploy">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">GitHub Pages deployment</div>
+          <h2>Drop this folder into a lab project page.</h2>
+        </div>
+        <p>
+          This page is a static site. It can be hosted on GitHub Pages without
+          a Python server, API keys or database.
+        </p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Option A: repository Pages</h3>
+          <p>Commit the `docs/` folder, then set GitHub Pages source to `main / docs`.</p>
+        </div>
+        <div class="card">
+          <h3>Option B: lab site subpage</h3>
+          <p>Copy `docs/index.html`, `docs/assets/` and `docs/downloads/` into a project folder on the lab website.</p>
+        </div>
+        <div class="card">
+          <h3>Option C: iframe embed</h3>
+          <p>Host this page once and embed it from the lab project page using an iframe or launch button.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="card">
+        <h2>Responsible-use note</h2>
+        <p>
+          AgoraSim is designed for exploratory scenario analysis, teaching,
+          method comparison and baseline construction. Its synthetic trajectories
+          should not be treated as measurements or predictions of real
+          populations, and claims about precise subgroup reactions require
+          empirical validation beyond the demo.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      AgoraSim: A Hybrid Agent-Based Modeling Framework. Static GitHub Pages frontend plus local-first runnable package.
+    </div>
+  </footer>
+
+  <script>
+    const scenarios = {
+      transit: {
+        title:"Transit policy announcement",
+        actions:["Support and share", "Support but wait", "Wait for proof", "Oppose the plan"],
+        base:[.24,.22,.36,.18],
+        quotes:[
+          "Late-night buses matter if they actually arrive on time.",
+          "People like the goal, but the fee design triggers fairness concerns.",
+          "The threshold/Bass reference changes more slowly until proof accumulates."
+        ],
+      },
+      ad: {
+        title:"New drink flyer test",
+        actions:["Buy immediately", "Try with discount", "Notice but skip", "Avoid the product"],
+        base:[.18,.34,.31,.17],
+        quotes:[
+          "Visual novelty creates attention, but price sensitivity caps conversion.",
+          "Students respond to trial offers more than brand claims.",
+          "Image-capable LLMs are needed for the full package workflow."
+        ],
+      },
+      market: {
+        title:"Market shock narrative",
+        actions:["Increase position", "Hold", "Reduce exposure", "Exit"],
+        base:[.16,.43,.27,.14],
+        quotes:[
+          "Herding increases holding behavior when the first round sounds confident.",
+          "Risk-averse personas move faster toward reduced exposure.",
+          "The herding reference is useful for interpreting this trajectory."
+        ],
+      }
+    };
+    const populationShift = {tokyo:0, students:.05, investors:-.04};
+    const protocolShift = {independent:-.03, diffusion:.06, focus:.02};
+
+    function pct(x) { return `${Math.round(x * 100)}%`; }
+    function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+    function normalize(arr) {
+      const total = arr.reduce((a,b)=>a+b, 0) || 1;
+      return arr.map(x=>x / total);
+    }
+    function runPreview() {
+      const scenario = scenarios[document.getElementById("scenario").value];
+      const pop = document.getElementById("population").value;
+      const protocol = document.getElementById("protocol").value;
+      const bump = populationShift[pop] + protocolShift[protocol];
+      const values = normalize(scenario.base.map((v, i) =>
+        clamp(v + (i < 2 ? bump : -bump / 1.4), .04, .74)));
+      const adoption = values[0] + values[1] * .62;
+      const stance = (values[0] * .9 + values[1] * .35) -
+        (values[2] * .12 + values[3] * .8);
+      const polar = Math.abs(values[0] - values[3]) + values[2] * .28;
+      const classicGap = protocol === "diffusion" ? .07 : protocol === "focus" ? .03 : -.02;
+      document.getElementById("mAdoption").textContent = pct(adoption);
+      document.getElementById("mStance").textContent = stance.toFixed(2);
+      document.getElementById("mPolar").textContent = polar.toFixed(2);
+      document.getElementById("mGap").textContent =
+        `${classicGap >= 0 ? "+" : ""}${Math.round(classicGap * 100)}%`;
+      document.getElementById("bars").innerHTML = scenario.actions.map((label, i) => `
+        <div class="bar-row">
+          <div>${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct(values[i])}"></div></div>
+          <div>${pct(values[i])}</div>
+        </div>`).join("");
+      document.getElementById("timeline").innerHTML = scenario.quotes.map((q, i) =>
+        `<div class="event"><b>Round ${i + 1}</b> ${q}</div>`).join("");
+    }
+    document.getElementById("runPreview").addEventListener("click", runPreview);
+    ["scenario", "population", "protocol"].forEach(id =>
+      document.getElementById(id).addEventListener("change", runPreview));
+    runPreview();
+  </script>
+</body>
+</html>
