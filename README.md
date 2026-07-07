@@ -1,6 +1,6 @@
 # AgoraSim
 
-**A hybrid agent-based modeling framework for scenario-oriented social reaction analysis.**
+**A hybrid agent-based modeling framework
 
 [Try the web demo](https://haalab.github.io/AgoraSim/) ·
 [Download local package](https://haalab.github.io/AgoraSim/downloads/agorasim-local-demo-package.zip) ·
